@@ -7,6 +7,7 @@ import org.apache.hadoop.hive.ql.exec.UDF;
  * @Author 加帆
  * @Date 2021/6/05 06:02
  * @Version 1.0
+ * @Description 值映射，类似Oracle中decode
  */
 
 public class MDecode extends UDF{

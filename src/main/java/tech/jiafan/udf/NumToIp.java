@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
  * @Author 加帆
  * @Date 2021/6/05 10:48
  * @Version 1.0
+ * @Description 整数还原为 IPv4
  */
 public class NumToIp {
     private final Logger logger = LogManager.getLogger(NumToIp.class);

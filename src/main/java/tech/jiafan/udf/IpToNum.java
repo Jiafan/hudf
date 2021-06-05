@@ -10,6 +10,7 @@ import org.apache.hadoop.hive.ql.exec.UDF;
  * @Author 加帆
  * @Date 2021/6/05 11:12
  * @Version 1.0
+ * @Description IPv4 转化为整数
  */
 public class IpToNum extends UDF{
     private final Logger logger = LogManager.getLogger(IpToNum.class);
