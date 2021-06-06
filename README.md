@@ -1,5 +1,32 @@
 # 自定义函数
 
+## 使用方法
+
+1. 找到适合的 release 版本 jar （或者自行编译）
+2. 拷贝到 hive 部署的一台服务器 或者 上传到 hdfs
+3. 注册函数
+    ```
+    CREATE [temporary] FUNCTION [db_name.]function_name AS class_name [USING JAR|FILE|ARCHIVE 'file_uri' [, JAR|FILE|ARCHIVE 'file_uri'] ];
+    ```
+    如下：
+    ```
+    CREATE FUNCTION default.mdecode AS 'tech.jiafan.udf.MDecode' USING JAR 'hdfs:///user/hive/udf/hudf-0.0.1.jar';
+    ```
+    注册了一个 mdecode 函数在 default 下
+4. 使用
+    ```
+    select user_type, default.mdecode(user_type,1, '个人会员', 2, '单位会员', 3, '特约会员', '其他会员') user_type_name from user_table
+    ```
+
+    在多hive gateway 若遇到找不到函数情况，在 spark sql 或者 hive cli 执行 下面语句
+
+    ```
+    reload function ;
+    ```
+
+
+
+
 ## UDF
 
 ### 1. **mdecode** 函数
