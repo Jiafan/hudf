@@ -51,11 +51,4 @@ public class MDecode extends UDF{
         }
         return String.valueOf(result);
     }
-
-    public static void main(String[] args) {
-        MDecode decode = new MDecode();
-        System.out.println(decode.evaluate("3", 1, "个人", 2, "企业", 3, "特约", "其他"));
-        System.out.println(decode.evaluate("5", 1, "个人", 2, "企业", 3, "特约",5,"子户", "其他"));
-        System.out.println(decode.evaluate(3, '1', "个人", 2, "企业", "3", "特约", "其他"));
-    }
 }

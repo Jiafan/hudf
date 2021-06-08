@@ -2,9 +2,6 @@ package tech.jiafan.udf;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -71,14 +68,5 @@ public class DateToSign {
             logger.info("参数日期为空");
             return null;
         }
-    }
-
-    public static void main(String[] args) throws ParseException {
-        DateToSign dateToSign = new DateToSign();
-        SimpleDateFormat formatter =  new SimpleDateFormat("yyyyMMdd");
-        System.out.println(dateToSign.evaluate(formatter.parse("20210101")));
-        System.out.println(dateToSign.evaluate(formatter.parse("20211205")));
-        System.out.println(dateToSign.evaluate(formatter.parse("20211222")));
-        System.out.println(dateToSign.evaluate(formatter.parse("20210605")));
     }
 }

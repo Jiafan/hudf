@@ -51,12 +51,4 @@ public class IpToNum extends UDF{
         return evaluate(ip, null);
     }
 
-    public static void main(String[] args) {
-        IpToNum itn = new IpToNum();
-        System.out.println(itn.evaluate("123.1.23.2"));
-        System.out.println(itn.evaluate("324.1.23.2", 0L));
-        System.out.println(itn.evaluate("255.255.255.255"));
-
-    }
-
 }

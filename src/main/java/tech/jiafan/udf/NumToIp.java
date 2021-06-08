@@ -53,10 +53,4 @@ public class NumToIp {
         return evaluate(col, null);
     }
 
-    public static void main(String[] args) {
-        NumToIp nti = new NumToIp();
-        System.out.println(nti.evaluate(123,"-"));
-        System.out.println(nti.evaluate("a123"));
-        System.out.println(nti.evaluate(999999999999L));
-    }
 }
