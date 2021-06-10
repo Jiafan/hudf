@@ -1,4 +1,4 @@
-package tech.jiafan.udf;
+package tech.jiafan.lab;
 
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
@@ -26,6 +26,7 @@ public class MyUDF extends GenericUDF{
 
     @Override
     public String getDisplayString(String[] strings) {
-        return null;
+
+        return "用来测试学习的UDF";
     }
 }
