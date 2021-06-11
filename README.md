@@ -73,3 +73,12 @@
 
 ## UDTF
 
+### 1. **dateRangeExplode** 函数
+
+> 作用： 根据起止日期，纵向展开， 配合 lateral view 优化拉链表 关联条件必须写在 where子句中的，过程中产生笛卡尔积的性能问题
+
+> 参数：(start_date , end_date)
+
+> 参数说明: 参数可为 Date 、Timestamp、String（yyyy-MM-dd） 类型
+
+> 返回：生成表
