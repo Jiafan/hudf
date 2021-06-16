@@ -19,7 +19,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
 
 public class DateConverter {
     private transient Converter converter;
-    private transient PrimitiveObjectInspector.PrimitiveCategory inputType;
+    private transient final PrimitiveObjectInspector.PrimitiveCategory inputType;
     private transient final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
     public DateConverter(ObjectInspector objectInspector){
@@ -29,12 +29,15 @@ public class DateConverter {
             case VARCHAR:
             case CHAR:
                 converter = ObjectInspectorConverters.getConverter(objectInspector, PrimitiveObjectInspectorFactory.writableStringObjectInspector);
+                break;
             case TIMESTAMP:
                 converter =  new PrimitiveObjectInspectorConverter.TimestampConverter((PrimitiveObjectInspector) objectInspector,
                         PrimitiveObjectInspectorFactory.writableTimestampObjectInspector);
+                break;
             case DATE:
                 converter =  ObjectInspectorConverters.getConverter(objectInspector,
                         PrimitiveObjectInspectorFactory.writableDateObjectInspector);
+                break;
             default:
                 converter = null;
         }

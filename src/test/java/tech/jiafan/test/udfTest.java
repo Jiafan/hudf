@@ -1,3 +1,5 @@
+package tech.jiafan.test;
+
 import org.junit.Test;
 import tech.jiafan.udf.DateToSign;
 import tech.jiafan.udf.IpToNum;
