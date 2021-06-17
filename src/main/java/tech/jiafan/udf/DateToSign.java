@@ -1,10 +1,17 @@
 package tech.jiafan.udf;
 
+import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
+import org.apache.hadoop.hive.ql.exec.UDFArgumentLengthException;
+import org.apache.hadoop.hive.ql.metadata.HiveException;
+import org.apache.hadoop.hive.ql.udf.generic.GenericUDF;
+import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import java.util.Calendar;
 import java.util.Date;
-
+import tech.jiafan.util.DateConverter;
 
 /**
  * @Author 加帆
@@ -12,8 +19,9 @@ import java.util.Date;
  * @Version 1.0
  * @Description 获取日期对应星座
  */
-public class DateToSign {
+public class DateToSign extends GenericUDF {
     private final Logger logger = LogManager.getLogger(DateToSign.class);
+    private DateConverter converter;
 
     private String mapToSign(int month, int day){
         int int_day = month*100+day;
@@ -56,17 +64,38 @@ public class DateToSign {
         }
     }
 
-    public String evaluate(Date birthday) {
-        if (birthday!=null){
-            Calendar calender = Calendar.getInstance();
-            calender.setTime(birthday);
-            int month=calender.get(Calendar.MONTH)+1;//获取月份
-            int day=calender.get(Calendar.DATE);//获取日
-            return mapToSign(month, day);
+    @Override
+    public ObjectInspector initialize(ObjectInspector[] arguments) throws UDFArgumentException {
+        if (arguments==null || arguments.length!=1){
+            throw new UDFArgumentLengthException("date_to_sign() 需要一个参数");
         }
-        else {
-            logger.info("参数日期为空");
+        converter = new DateConverter(arguments[0]);
+        return PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveObjectInspector.PrimitiveCategory.STRING);
+    }
+
+    @Override
+    public Object evaluate(DeferredObject[] arguments) throws HiveException {
+        if (arguments==null || arguments.length!=1){
+            logger.info("实际参数异常");
             return null;
+        }else {
+            Date birthday = converter.convert(arguments[0].get());
+            if (birthday!=null){
+                Calendar calender = Calendar.getInstance();
+                calender.setTime(birthday);
+                int month=calender.get(Calendar.MONTH)+1;//获取月份
+                int day=calender.get(Calendar.DATE);//获取日
+                return mapToSign(month, day);
+            }
+            else {
+                logger.info("转化为date异常");
+                return null;
+            }
         }
+    }
+
+    @Override
+    public String getDisplayString(String[] children) {
+        return "date_to_sign() 日期生成星座";
     }
 }
