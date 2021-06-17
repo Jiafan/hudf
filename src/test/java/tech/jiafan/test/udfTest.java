@@ -13,9 +13,9 @@ public class udfTest {
     @Test
     public void  testIpToNum(){
         IpToNum itn = new IpToNum();
-        System.out.println(itn.evaluate("123.1.23.2"));
-        System.out.println(itn.evaluate("324.1.23.2", 0L));
-        System.out.println(itn.evaluate("255.255.255.255"));
+//        System.out.println(itn.evaluate("123.1.23.2"));
+//        System.out.println(itn.evaluate("324.1.23.2", 0L));
+//        System.out.println(itn.evaluate("255.255.255.255"));
     }
 
     @Test
@@ -30,10 +30,10 @@ public class udfTest {
     public void testDateToSign() throws ParseException {
         DateToSign dateToSign = new DateToSign();
         SimpleDateFormat formatter =  new SimpleDateFormat("yyyyMMdd");
-        System.out.println(dateToSign.evaluate(formatter.parse("20210101")));
-        System.out.println(dateToSign.evaluate(formatter.parse("20211205")));
-        System.out.println(dateToSign.evaluate(formatter.parse("20211222")));
-        System.out.println(dateToSign.evaluate(formatter.parse("20210605")));
+//        System.out.println(dateToSign.evaluate(formatter.parse("20210101")));
+//        System.out.println(dateToSign.evaluate(formatter.parse("20211205")));
+//        System.out.println(dateToSign.evaluate(formatter.parse("20211222")));
+//        System.out.println(dateToSign.evaluate(formatter.parse("20210605")));
     }
 
     @Test

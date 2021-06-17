@@ -2,9 +2,16 @@ package tech.jiafan.udf;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
+import org.apache.hadoop.hive.ql.exec.UDFArgumentLengthException;
+import org.apache.hadoop.hive.ql.metadata.HiveException;
+import org.apache.hadoop.hive.ql.udf.generic.GenericUDF;
+import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.apache.hadoop.hive.ql.exec.UDF;
 
 /**
  * @Author 加帆
@@ -12,7 +19,7 @@ import org.apache.hadoop.hive.ql.exec.UDF;
  * @Version 1.0
  * @Description IPv4 转化为整数
  */
-public class IpToNum extends UDF{
+public class IpToNum extends GenericUDF {
     private final Logger logger = LogManager.getLogger(IpToNum.class);
 
     /** * 判断是否为合法IP * @return the ip */
@@ -23,32 +30,37 @@ public class IpToNum extends UDF{
         return matcher.matches();
     }
 
-    public Long evaluate(Object ip, Object other) {
-        String ipAddress = ip.toString();
-        if (isIp(ipAddress)){
-            String[] ip_pieces = ipAddress.split("\\.");
-            long a = Integer.parseInt(ip_pieces[0]);
-            long b = Integer.parseInt(ip_pieces[1]);
-            long c = Integer.parseInt(ip_pieces[2]);
-            long d = Integer.parseInt(ip_pieces[3]);
-            return a * 256 * 256 * 256 + b * 256 * 256 + c * 256 + d;
-        }
-        else if (other == null){
-            logger.warn(String.format("非法IP地址:%s", ipAddress));
-            return null;
-        }
-        try {
-            return Long.valueOf(other.toString());
-        }
-        catch (Exception ex){
-            logger.warn("IP地址非法，且 默认值非法，不是长整数");
-            ex.printStackTrace();
-            return null;
+    @Override
+    public ObjectInspector initialize(ObjectInspector[] arguments) throws UDFArgumentException {
+        if (arguments==null || arguments.length != 1){
+            throw new UDFArgumentLengthException("参数长度异常：ip_to_num 接受一个string类型参数");
+        }else {
+            return PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveObjectInspector.PrimitiveCategory.LONG);
         }
     }
 
-    public Long evaluate(Object ip) {
-        return evaluate(ip, null);
+    @Override
+    public Object evaluate(DeferredObject[] arguments) throws HiveException {
+        if (arguments==null || arguments.length != 1){
+            return null;
+        }else {
+            String srcIp = arguments[0].get().toString();
+            if (isIp(srcIp)){
+                String[] ip_pieces = srcIp.split("\\.");
+                long a = Integer.parseInt(ip_pieces[0]);
+                long b = Integer.parseInt(ip_pieces[1]);
+                long c = Integer.parseInt(ip_pieces[2]);
+                long d = Integer.parseInt(ip_pieces[3]);
+                return a * 256 * 256 * 256 + b * 256 * 256 + c * 256 + d;
+            }else{
+                logger.info(String.format("不是合法的IP地址 %s", srcIp));
+                return null;
+            }
+        }
     }
 
+    @Override
+    public String getDisplayString(String[] children) {
+        return null;
+    }
 }
