@@ -7,6 +7,7 @@ import org.apache.hadoop.hive.ql.udf.generic.GenericUDF;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
+import org.apache.hadoop.io.Text;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import java.util.Calendar;
@@ -85,7 +86,7 @@ public class DateToSign extends GenericUDF {
                 calender.setTime(birthday);
                 int month=calender.get(Calendar.MONTH)+1;//获取月份
                 int day=calender.get(Calendar.DATE);//获取日
-                return mapToSign(month, day);
+                return new Text(mapToSign(month, day));
             }
             else {
                 logger.info("转化为date异常");

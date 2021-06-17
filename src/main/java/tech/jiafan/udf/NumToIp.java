@@ -1,9 +1,17 @@
 package tech.jiafan.udf;
 
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
+import org.apache.hadoop.hive.ql.exec.UDFArgumentLengthException;
+import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDF;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.IntObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.LongObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.StringObjectInspector;
+import org.apache.hadoop.io.Text;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -15,24 +23,30 @@ import org.apache.log4j.Logger;
  */
 public class NumToIp extends GenericUDF {
     private final Logger logger = LogManager.getLogger(NumToIp.class);
+    private transient PrimitiveObjectInspector.PrimitiveCategory inputType;
 
-    private String deal_other(Object other){
-        if (other == null){
-            return null;
+    @Override
+    public ObjectInspector initialize(ObjectInspector[] arguments) throws UDFArgumentException {
+        if (arguments==null || arguments.length != 1){
+            throw new UDFArgumentLengthException("参数长度异常：ip_to_num 接受一个string类型参数");
+        }else if (!(arguments[0] instanceof StringObjectInspector) && !(arguments[0] instanceof LongObjectInspector) && !(arguments[0] instanceof IntObjectInspector)){
+            throw new UDFArgumentTypeException(0, "num_to_ip 接受一个 string/int/long 类型参数");
         }else {
-            return other.toString();
+            inputType = ((PrimitiveObjectInspector) arguments[0]).getPrimitiveCategory();
+            return PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveObjectInspector.PrimitiveCategory.STRING);
         }
     }
 
-    public String evaluate(Object col, Object other) {
-        long[] mask = { 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000 };
-
-        try{
-            long ipLong = Long.parseLong(col.toString());
-
+    @Override
+    public Object evaluate(DeferredObject[] arguments) throws HiveException {
+        if(arguments==null || arguments.length != 1 || arguments[0]==null){
+            return null;
+        }else{
+            long[] mask = { 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000 };
+            long ipLong = inputType== PrimitiveObjectInspector.PrimitiveCategory.STRING?Long.parseLong(arguments[0].get().toString()):Long.valueOf(arguments[0].get().toString());
             if (ipLong>4294967295L || ipLong<0){
                 logger.warn(String.format("数字超出范围，无法转化 %d", ipLong));
-                return deal_other(other);
+                return null;
             }
             long flag;
             StringBuilder ipInfo = new StringBuilder();
@@ -43,29 +57,8 @@ public class NumToIp extends GenericUDF {
                     ipInfo.insert(0, ".");
                 ipInfo.insert(0, Long.toString(flag, 10));
             }
-            return ipInfo.toString();
+            return new Text(ipInfo.toString());
         }
-        catch (Exception ex){
-            logger.error("待转换值不是数字");
-            logger.error(col);
-            ex.printStackTrace();
-            return deal_other(other);
-        }
-    }
-
-    public String evaluate(Object col) {
-        return evaluate(col, null);
-    }
-
-    @Override
-    public ObjectInspector initialize(ObjectInspector[] arguments) throws UDFArgumentException {
-        
-        return null;
-    }
-
-    @Override
-    public Object evaluate(DeferredObject[] arguments) throws HiveException {
-        return null;
     }
 
     @Override

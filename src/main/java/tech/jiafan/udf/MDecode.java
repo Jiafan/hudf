@@ -8,6 +8,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.StringObjectInspector;
+import org.apache.hadoop.io.Text;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.hadoop.hive.ql.exec.UDF;
@@ -77,7 +78,7 @@ public class MDecode extends GenericUDF {
         if (result == null){
             result = arguments[arguments.length-1];
         }
-        return String.valueOf(result);
+        return new Text(String.valueOf(result));
     }
 
     @Override

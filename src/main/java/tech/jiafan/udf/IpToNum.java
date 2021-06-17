@@ -2,14 +2,16 @@ package tech.jiafan.udf;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentLengthException;
+import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDF;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.StringObjectInspector;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -34,6 +36,8 @@ public class IpToNum extends GenericUDF {
     public ObjectInspector initialize(ObjectInspector[] arguments) throws UDFArgumentException {
         if (arguments==null || arguments.length != 1){
             throw new UDFArgumentLengthException("参数长度异常：ip_to_num 接受一个string类型参数");
+        }else if (!(arguments[0] instanceof StringObjectInspector)){
+            throw new UDFArgumentTypeException(0, "ip_to_num 接受一个 string 类型参数");
         }else {
             return PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveObjectInspector.PrimitiveCategory.LONG);
         }
@@ -51,7 +55,7 @@ public class IpToNum extends GenericUDF {
                 long b = Integer.parseInt(ip_pieces[1]);
                 long c = Integer.parseInt(ip_pieces[2]);
                 long d = Integer.parseInt(ip_pieces[3]);
-                return a * 256 * 256 * 256 + b * 256 * 256 + c * 256 + d;
+                return new LongWritable(a * 256 * 256 * 256 + b * 256 * 256 + c * 256 + d);
             }else{
                 logger.info(String.format("不是合法的IP地址 %s", srcIp));
                 return null;
@@ -61,6 +65,6 @@ public class IpToNum extends GenericUDF {
 
     @Override
     public String getDisplayString(String[] children) {
-        return null;
+        return "ip_to_num() ip转数字";
     }
 }
