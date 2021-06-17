@@ -1,4 +1,13 @@
 package tech.jiafan.udf;
+import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
+import org.apache.hadoop.hive.ql.exec.UDFArgumentLengthException;
+import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
+import org.apache.hadoop.hive.ql.metadata.HiveException;
+import org.apache.hadoop.hive.ql.udf.generic.GenericUDF;
+import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.StringObjectInspector;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.hadoop.hive.ql.exec.UDF;
@@ -10,7 +19,7 @@ import org.apache.hadoop.hive.ql.exec.UDF;
  * @Description 值映射，类似Oracle中decode
  */
 
-public class MDecode extends UDF{
+public class MDecode extends GenericUDF {
     private final Logger logger = LogManager.getLogger(MDecode.class);
     // 判断字符串是否可转化为数字
     private static boolean isNumeric(String s) {
@@ -30,25 +39,49 @@ public class MDecode extends UDF{
         }
     }
 
-    public String evaluate(Object... args) {
-        if (args.length<4 && args.length %2 != 0){
+    @Override
+    public ObjectInspector initialize(ObjectInspector[] arguments) throws UDFArgumentException {
+        if (arguments==null || arguments.length %2 != 0){
+            throw new UDFArgumentLengthException("mdecode()输入的参数个数错误，参数至少含4个，且个数应为偶数，参照 Oracle decode 函数");
+        }
+        else{
+            for (int i=2; i<arguments.length-1; i+=2){
+                if (!(arguments[i] instanceof StringObjectInspector)) {
+                    throw new UDFArgumentTypeException(i, "目标值需为字符串类型");
+                }
+            }
+            // 返回字符串类型
+            return PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveObjectInspector.PrimitiveCategory.STRING);
+        }
+    }
+
+    @Override
+    public Object evaluate(DeferredObject[] arguments) throws HiveException {
+        if (arguments.length<4 && arguments.length %2 != 0){
             logger.error("输入的参数个数错误，参数至少含4个，且个数应为偶数，参照 Oracle decode 函数");
             //非法参数， 返回 空
             return null;
         }
         Object result = null;
-        args[0] = formatObject(args[0]);
-        for (int i=1; i<args.length-1; i+=2){
-            args[i] = formatObject(args[i]);
+        DeferredObject target = arguments[0];
+        String targetString = formatObject(target);
 
-            if (String.valueOf(args[i]).equals(String.valueOf(args[0]))){
-                result = args[i+1];
+        for (int i=1; i<arguments.length-1; i+=2){
+            String caseValue = formatObject(arguments[i]);
+
+            if (caseValue.equals(targetString)){
+                result = arguments[i+1];
                 break;
             }
         }
         if (result == null){
-            result = args[args.length-1];
+            result = arguments[arguments.length-1];
         }
         return String.valueOf(result);
+    }
+
+    @Override
+    public String getDisplayString(String[] children) {
+        return "mdecode() 映射解码函数，为简化 case 语句，可参照 oracle decode 函数使用";
     }
 }

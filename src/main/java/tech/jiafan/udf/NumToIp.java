@@ -1,5 +1,9 @@
 package tech.jiafan.udf;
 
+import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
+import org.apache.hadoop.hive.ql.metadata.HiveException;
+import org.apache.hadoop.hive.ql.udf.generic.GenericUDF;
+import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -9,7 +13,7 @@ import org.apache.log4j.Logger;
  * @Version 1.0
  * @Description 整数还原为 IPv4
  */
-public class NumToIp {
+public class NumToIp extends GenericUDF {
     private final Logger logger = LogManager.getLogger(NumToIp.class);
 
     private String deal_other(Object other){
@@ -53,4 +57,19 @@ public class NumToIp {
         return evaluate(col, null);
     }
 
+    @Override
+    public ObjectInspector initialize(ObjectInspector[] arguments) throws UDFArgumentException {
+        
+        return null;
+    }
+
+    @Override
+    public Object evaluate(DeferredObject[] arguments) throws HiveException {
+        return null;
+    }
+
+    @Override
+    public String getDisplayString(String[] children) {
+        return null;
+    }
 }
