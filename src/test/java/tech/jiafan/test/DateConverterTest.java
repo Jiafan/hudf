@@ -24,7 +24,7 @@ public class DateConverterTest {
         //Int
         ObjectInspector intInspector = PrimitiveObjectInspectorFactory.getPrimitiveJavaObjectInspector(
                 PrimitiveObjectInspector.PrimitiveCategory.FLOAT);
-        Assert.assertEquals("可转换", Boolean.TRUE, DateConverter.evaluate(intInspector));
+        Assert.assertEquals("可转换", Boolean.FALSE, DateConverter.evaluate(intInspector));
     }
     @Test
     public void testConvertDate() throws HiveException {

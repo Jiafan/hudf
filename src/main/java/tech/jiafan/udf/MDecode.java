@@ -11,7 +11,6 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.StringObjectInspe
 import org.apache.hadoop.io.Text;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.apache.hadoop.hive.ql.exec.UDF;
 
 /**
  * @Author 加帆
@@ -65,18 +64,18 @@ public class MDecode extends GenericUDF {
         }
         Object result = null;
         DeferredObject target = arguments[0];
-        String targetString = formatObject(target);
+        String targetString = formatObject(target.get());
 
         for (int i=1; i<arguments.length-1; i+=2){
-            String caseValue = formatObject(arguments[i]);
+            String caseValue = formatObject(arguments[i].get());
 
             if (caseValue.equals(targetString)){
-                result = arguments[i+1];
+                result = arguments[i+1].get().toString();
                 break;
             }
         }
         if (result == null){
-            result = arguments[arguments.length-1];
+            result = arguments[arguments.length-1].get().toString();
         }
         return new Text(String.valueOf(result));
     }
