@@ -13,9 +13,9 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 /**
- * @Author 加帆
+ * @author 加帆
  * @Date 2021/6/05 06:02
- * @Version 1.0
+ * @version 1.0
  * @Description 值映射，类似Oracle中decode
  */
 

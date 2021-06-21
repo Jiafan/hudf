@@ -1,5 +1,6 @@
 package tech.jiafan.udf;
 
+import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentLengthException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
@@ -15,11 +16,17 @@ import java.util.Date;
 import tech.jiafan.util.DateConverter;
 
 /**
- * @Author 加帆
- * @Date 2021/6/05 11:12
- * @Version 1.0
- * @Description 获取日期对应星座
+ * @author 加帆
+ * @version 1.0
  */
+//@Description(name = "date_to_sign", value = "_FUNC_(input date/timestamp/string) - date_to_sign input date convert to Zodiac Signs",
+//        extended = "input can be date、timestamp or string"
+//                + "If either argument is NULL or the value can not convert to a legal date, the return value is NULL.\n"
+//                + "Example: > SELECT _FUNC_('2021-06-21');\n 'Gemini'")
+@Description(name = "date_to_sign", value = "_FUNC_(input date/timestamp/string) - date_to_sign 输入时间字段转换为12星座",
+        extended = "输入时间可为 date、timestamp 或者 指定格式字符串（yyyy-MM-dd）"
+                + "如果该列出现空值 或者 输入的字符串不是 'yyyy-MM-dd' 格式无法转换为时间, 则返回空.\n"
+                + "Example: > SELECT _FUNC_('2021-06-21');\n '双子座'")
 public class DateToSign extends GenericUDF {
     private final Logger logger = LogManager.getLogger(DateToSign.class);
     private DateConverter converter;
@@ -97,6 +104,6 @@ public class DateToSign extends GenericUDF {
 
     @Override
     public String getDisplayString(String[] children) {
-        return "date_to_sign() 日期生成星座";
+        return getStandardDisplayString("date_to_sign() 日期生成星座", children);
     }
 }

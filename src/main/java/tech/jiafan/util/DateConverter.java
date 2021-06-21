@@ -18,7 +18,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
 
 
 public class DateConverter {
-    private transient Converter converter;
+    private transient final Converter converter;
     private transient final PrimitiveObjectInspector.PrimitiveCategory inputType;
     private transient final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 

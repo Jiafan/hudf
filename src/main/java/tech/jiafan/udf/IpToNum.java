@@ -2,6 +2,8 @@ package tech.jiafan.udf;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentLengthException;
@@ -16,11 +18,13 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 /**
- * @Author 加帆
- * @Date 2021/6/05 11:12
- * @Version 1.0
- * @Description IPv4 转化为整数
+ * @author 加帆
+ * @version 1.0
  */
+@Description(name = "ip_to_num", value = "_FUNC_(string) - ip_to_num 输入IPv4地址，转换为整数",
+        extended = "输入一个合法的 IPv4 的地址"
+                + "如果该列出现空值 或者 输入的字符串不是合法的 IPv4地址, 则返回空.\n"
+                + "Example: > SELECT _FUNC_('123.123.22.4');\n Return: 2071664132")
 public class IpToNum extends GenericUDF {
     private final Logger logger = LogManager.getLogger(IpToNum.class);
 

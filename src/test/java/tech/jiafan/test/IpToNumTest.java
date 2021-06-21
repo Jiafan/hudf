@@ -23,7 +23,8 @@ public class IpToNumTest {
 
     @Test//测试合法ip
     public void testNumToIpLegal() throws HiveException {
-        Object ip = ipToNum.evaluate(new GenericUDF.DeferredObject[]{new GenericUDF.DeferredJavaObject("123.123.232.1")});
+        Object ip = ipToNum.evaluate(new GenericUDF.DeferredObject[]{new GenericUDF.DeferredJavaObject("123.123.22.4")});
+        System.out.println(ip);
         Assert.assertNotNull("合法IP 转换不应该空",ip);
     }
 
