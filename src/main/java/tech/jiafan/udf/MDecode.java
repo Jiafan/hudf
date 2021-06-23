@@ -21,23 +21,6 @@ import org.apache.log4j.Logger;
 
 public class MDecode extends GenericUDF {
     private final Logger logger = LogManager.getLogger(MDecode.class);
-    // 判断字符串是否可转化为数字
-    private static boolean isNumeric(String s) {
-        if (s != null && !"".equals(s.trim()))
-            return s.matches("^[0-9]*$");
-        else
-            return false;
-    }
-    // 标准化数字：数字、数字字符串, ,消除如 1 、1.0、'1'、'1.0' 的差异
-    private static String formatObject(Object s) {
-        if ((s instanceof Integer) || ((s instanceof String) && isNumeric(s.toString()))){
-            double num = Double.parseDouble(s.toString());
-            return Double.toString(num);
-        }else{
-            // 其他类型
-            return String.valueOf(s);
-        }
-    }
 
     @Override
     public ObjectInspector initialize(ObjectInspector[] arguments) throws UDFArgumentException {
@@ -57,14 +40,9 @@ public class MDecode extends GenericUDF {
 
     @Override
     public Object evaluate(DeferredObject[] arguments) throws HiveException {
-        if (arguments.length<4 && arguments.length %2 != 0){
-            logger.error("输入的参数个数错误，参数至少含4个，且个数应为偶数，参照 Oracle decode 函数");
-            //非法参数， 返回 空
-            return null;
-        }
         Object result = null;
-        DeferredObject target = arguments[0];
-        String targetString = formatObject(target.get());
+        DeferredObject source = arguments[0];
+        String targetString = formatObject(source.get());
 
         for (int i=1; i<arguments.length-1; i+=2){
             String caseValue = formatObject(arguments[i].get());
@@ -82,6 +60,24 @@ public class MDecode extends GenericUDF {
 
     @Override
     public String getDisplayString(String[] children) {
-        return "mdecode() 映射解码函数，为简化 case 语句，可参照 oracle decode 函数使用";
+        return getStandardDisplayString("mdecode() 映射解码函数，为简化 case 语句，可参照 oracle decode 函数使用", children);
+    }
+
+    // 判断字符串是否可转化为数字
+    private static boolean isNumeric(String s) {
+        if (s != null && !"".equals(s.trim()))
+            return s.matches("^[0-9]*$");
+        else
+            return false;
+    }
+    // 标准化数字：数字、数字字符串, ,消除如 1 、1.0、'1'、'1.0' 的差异
+    private static String formatObject(Object s) {
+        if ((s instanceof Integer) || ((s instanceof String) && isNumeric(s.toString()))){
+            double num = Double.parseDouble(s.toString());
+            return Double.toString(num);
+        }else{
+            // 其他类型
+            return String.valueOf(s);
+        }
     }
 }
