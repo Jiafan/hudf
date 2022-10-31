@@ -29,22 +29,15 @@ public class DateRangeExplode extends GenericUDTF {
     private transient PrimitiveObjectInspector.PrimitiveCategory inputType2;
     private static Logger logger;
     @Override
-    public StructObjectInspector initialize(ObjectInspector[] argOIs) throws UDFArgumentException {
+    public StructObjectInspector initialize(StructObjectInspector argOIs) throws UDFArgumentException {
         logger = LogManager.getLogger(StructObjectInspector.class);
-
-        if (argOIs.length!=2){
+        if (argOIs.length != 2) {
             throw new UDFArgumentException("DateRangeExplode() 需要两个参数");
         }
         inputConverter1 = checkArguments(argOIs, 0);
         inputConverter2 = checkArguments(argOIs, 1);
         inputType1 = ((PrimitiveObjectInspector) argOIs[0]).getPrimitiveCategory();
         inputType2 = ((PrimitiveObjectInspector) argOIs[1]).getPrimitiveCategory();
-
-        ArrayList<String> fieldNames = new ArrayList<String>();
-        ArrayList<ObjectInspector> fieldOIs = new ArrayList<ObjectInspector>();
-        fieldNames.add("col");
-        fieldOIs.add(PrimitiveObjectInspectorFactory.writableDateObjectInspector);
-        return ObjectInspectorFactory.getStandardStructObjectInspector(fieldNames, fieldOIs);
     }
     @Override
     public void process(Object[] args) throws HiveException {
