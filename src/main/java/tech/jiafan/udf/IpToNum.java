@@ -3,7 +3,9 @@ package tech.jiafan.udf;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.hadoop.hive.ql.exec.Description;
+import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorConverters;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentLengthException;
@@ -27,6 +29,7 @@ import org.apache.log4j.Logger;
                 + "Example: > SELECT _FUNC_('123.123.22.4');\n Return: 2071664132")
 public class IpToNum extends GenericUDF {
     private final Logger logger = LogManager.getLogger(IpToNum.class);
+    private ObjectInspectorConverters.Converter[] converters;
 
     /** * 判断是否为合法IP * @return the ip */
     private boolean isIp(String ipAddress) {
@@ -43,16 +46,22 @@ public class IpToNum extends GenericUDF {
         }else if (!(arguments[0] instanceof StringObjectInspector)){
             throw new UDFArgumentTypeException(0, "ip_to_num 接受一个 string 类型参数");
         }else {
+            converters = new ObjectInspectorConverters.Converter[arguments.length];
+            for (int i = 0; i < arguments.length; i++) {
+                converters[i] = ObjectInspectorConverters.getConverter(arguments[i],
+                        PrimitiveObjectInspectorFactory.writableStringObjectInspector);
+            }
+
             return PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(PrimitiveObjectInspector.PrimitiveCategory.LONG);
         }
     }
 
     @Override
     public Object evaluate(DeferredObject[] arguments) throws HiveException {
-        if (arguments==null || arguments.length != 1){
+        String srcIp = (String) converters[0].convert(arguments[0].get());
+        if (srcIp == null) {
             return null;
         }else {
-            String srcIp = arguments[0].get().toString();
             if (isIp(srcIp)){
                 String[] ip_pieces = srcIp.split("\\.");
                 long a = Integer.parseInt(ip_pieces[0]);
