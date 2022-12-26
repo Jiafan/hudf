@@ -43,34 +43,6 @@ public class DateConverter {
         }
     }
 
-    public Date convert(Object src) throws HiveException {
-        Date date = new Date(0);
-        switch (inputType) {
-            case STRING:
-            case VARCHAR:
-            case CHAR:
-                String dateString = converter.convert(src).toString();
-                try {
-                    date.setTime(formatter.parse(dateString).getTime());
-                } catch (IllegalArgumentException | ParseException e) {
-                    return null;
-                }
-                break;
-            case TIMESTAMP:
-                Timestamp ts = ((TimestampWritable) converter.convert(src))
-                        .getTimestamp();
-                date.setTime(ts.getTime());
-                break;
-            case DATE:
-                DateWritable dw = (DateWritable) converter.convert(src);
-                date = dw.get();
-                break;
-            default:
-                throw new UDFArgumentException("DateRangeExplode() only takes STRING/TIMESTAMP/DATEWRITABLE types, got " + inputType);
-        }
-        return date;
-    }
-
     public static Boolean evaluate(ObjectInspector objectInspector) throws UDFArgumentException {
         if (objectInspector.getCategory() != ObjectInspector.Category.PRIMITIVE) {
             throw new UDFArgumentTypeException(0,
